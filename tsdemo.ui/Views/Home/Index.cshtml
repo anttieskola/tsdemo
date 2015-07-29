@@ -1,0 +1,199 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<!-- app area -->
+<div class="col-sm-5">
+    <div class="col-sm-12">
+        <h4>Products</h4>
+    </div>
+    <div class="col-sm-4">
+        <label>New:</label>
+    </div>
+    <div class="col-sm-8">
+        <input id="inputNewProduct" placeholder="Name of the product" type="text" />
+    </div>
+</div>
+<div class="col-sm-5 col-sm-offset-1">
+    <div class="col-sm-12">
+        <h4>Lines</h4>
+    </div>
+    <div class="col-sm-4">
+        <label>New:</label>
+    </div>
+    <div class="col-sm-8">
+        <input id="inputNewLine" placeholder="Name of the Line" type="text" />
+    </div>
+</div>
+
+<!-- views for products and lines -->
+<div id="products" class="col-sm-5"></div>
+<div id="lines" class="col-sm-5 col-sm-offset-2"></div>
+<div id="statuses" class="col-sm-5"></div>
+
+<!-- templates -->
+<script type="text/template" id="productList-template">
+    <div class="col-sm-12">
+        <div class="col-sm-2">
+            <%=id%>
+        </div>
+        <div class="col-sm-8">
+            <%=Name%>
+        </div>
+        <div class="col-sm-2">
+            <div class="row">
+                <button class="btn btn-default editButton">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </button>
+            </div>
+            <div class="row">
+                <button class="btn btn-default deleteButton">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="productListEdit-template">
+    <div class="col-sm-12">
+        @*<h4>Edit</h4>*@
+        <div class="col-sm-2">
+            <%=id%>
+        </div>
+        <div class="col-sm-8">
+            <input name="Name" type="text" value="<%=Name%>" />
+        </div>
+        <div class="col-sm-2">
+            <div class="row">
+                <button class="btn btn-default saveButton">
+                    <span class="glyphicon glyphicon-ok"></span>
+                </button>
+            </div>
+            <div class="row">
+                <button class="btn btn-default cancelButton">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-offset-2 col-sm-8">
+        <!-- line selector spot -->
+        <div class="lineSelect"></div>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-default">
+            <span class="glyphicon glyphicon-plus lineAddButton"></span>
+        </button>
+    </div>
+    <div class="col-sm-10 col-sm-offset-2">
+        <% _.each(Lines, function (line) {%>
+        <div class="col-sm-12">
+            <div class="col-sm-10">
+                <%=line.LineId%>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-default">
+                    <span class="glyphicon glyphicon-trash lineDeleteButton" data-lineId="<%=line.LineId%>"></span>
+                </button>
+            </div>
+        </div>
+        <% }) %>
+    </div>
+</script>
+
+<script type="text/template" id="lineList-template">
+    <div class="col-sm-12">
+        <div class="col-sm-2">
+            <%=id%>
+        </div>
+        <div class="col-sm-7">
+            <%=Name%>
+        </div>
+        <div class="col-sm-3">
+            <div class="row">
+                <button class="btn btn-default editButton">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </button>
+            </div>
+            <div class="row">
+                <button class="btn btn-default deleteButton">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="lineListEdit-template">
+    <div class="col-sm-12">
+        <div class="col-sm-2">
+            <%=id%>
+        </div>
+        <div class="col-sm-7">
+            <input name="Name" type="text" value="<%=Name%>" />
+        </div>
+        <div class="col-sm-3">
+            <div class="row">
+                <button class="btn btn-default saveButton">
+                    <span class="glyphicon glyphicon-ok"></span>
+                </button>
+            </div>
+            <div class="row">
+                <button class="btn btn-default cancelButton">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="status-template">
+    <div class="col-sm-12">
+        <div class="col-sm-2">
+            <%=id%>
+        </div>
+        <div class="col-sm-3">
+            <%=Complete%>
+        </div>
+        <div class="col-sm-2">
+            <%=ProductId%>
+        </div>
+        <div class="col-sm-2">
+            <%=OperationId%>
+        </div>
+        <div class="col-sm-3">
+            <div class="row">
+                <button class="btn btn-default editButton">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </button>
+            </div>
+            <div class="row">
+                <button class="btn btn-default deleteButton">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="statusAdd-template">
+
+</script>
+
+<script type="text/template" id="statusEdit-template">
+
+</script>
+
+@section scripts {
+    <!-- application loaded with require -->
+    <script src="~/lib/requirejs/require.js"></script>
+    <script>
+        require.config({
+            baseUrl: 'ts'
+        });
+        require(['/ts/Application.js'], function (ts) {
+            ts.Application.Run();
+        });
+    </script>
+}
