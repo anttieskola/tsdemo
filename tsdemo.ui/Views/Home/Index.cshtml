@@ -2,187 +2,333 @@
     ViewData["Title"] = "Index";
 }
 
-<!-- app area -->
-<div class="col-sm-5">
-    <div class="col-sm-12">
+<div class="content">
+    <!-- BootStrap nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#status" aria-controls="status" role="tab" data-toggle="tab">Status</a></li>
+        <li role="presentation"><a href="#products" aria-controls="products" role="tab" data-toggle="tab">Products</a></li>
+        <li role="presentation"><a href="#lines" aria-controls="lines" role="tab" data-toggle="tab">Lines</a></li>
+    </ul>
+    <!-- BootStrap panes for tabs -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="status">
+
+        </div>
+        <div role="tabpanel" class="tab-pane" id="products">
+            <div class="col-sm-6" id="divProducts"></div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="lines">
+            <!-- Here you create lines and define it's operations -->
+            <div class="col-sm-6" id="divLines"></div>
+            <div class="col-sm-6" id="divOperations"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TEMPLATES -->
+<!-- PRODUCT -->
+<!-- product list header and add button -->
+<script type="text/template" id="productListView-template">
+    <div class="col-sm-10">
         <h4>Products</h4>
     </div>
-    <div class="col-sm-4">
-        <label>New:</label>
-    </div>
-    <div class="col-sm-8">
-        <input id="inputNewProduct" placeholder="Name of the product" type="text" />
-    </div>
-</div>
-<div class="col-sm-5 col-sm-offset-1">
-    <div class="col-sm-12">
-        <h4>Lines</h4>
-    </div>
-    <div class="col-sm-4">
-        <label>New:</label>
-    </div>
-    <div class="col-sm-8">
-        <input id="inputNewLine" placeholder="Name of the Line" type="text" />
-    </div>
-</div>
-
-<!-- views for products and lines -->
-<div id="products" class="col-sm-5"></div>
-<div id="lines" class="col-sm-5 col-sm-offset-2"></div>
-<div id="statuses" class="col-sm-5"></div>
-
-<!-- templates -->
-<script type="text/template" id="productList-template">
-    <div class="col-sm-12">
-        <div class="col-sm-2">
-            <%=id%>
-        </div>
-        <div class="col-sm-8">
-            <%=Name%>
-        </div>
-        <div class="col-sm-2">
-            <div class="row">
-                <button class="btn btn-default editButton">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </button>
-            </div>
-            <div class="row">
-                <button class="btn btn-default deleteButton">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </button>
-            </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default addButton">
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
         </div>
     </div>
 </script>
-
-<script type="text/template" id="productListEdit-template">
+<!-- product list header and add form -->
+<script type="text/template" id="productListAddView-template">
     <div class="col-sm-12">
-        @*<h4>Edit</h4>*@
-        <div class="col-sm-2">
-            <%=id%>
-        </div>
-        <div class="col-sm-8">
-            <input name="Name" type="text" value="<%=Name%>" />
-        </div>
-        <div class="col-sm-2">
-            <div class="row">
-                <button class="btn btn-default saveButton">
-                    <span class="glyphicon glyphicon-ok"></span>
-                </button>
-            </div>
-            <div class="row">
-                <button class="btn btn-default cancelButton">
-                    <span class="glyphicon glyphicon-remove"></span>
-                </button>
-            </div>
-        </div>
+        <h4>Add new product</h4>
     </div>
-    <div class="col-sm-offset-2 col-sm-8">
-        <!-- line selector spot -->
-        <div class="lineSelect"></div>
+    <div class="col-sm-10">
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <input type="text" name="Name" />
+        </div>
     </div>
     <div class="col-sm-2">
-        <button class="btn btn-default">
-            <span class="glyphicon glyphicon-plus lineAddButton"></span>
+        <div class="row">
+            <button class="btn btn-default saveButton">
+                <span class="glyphicon glyphicon-ok"></span>
+            </button>
+        </div>
+        <div class="row">
+            <button class="btn btn-default cancelButton">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+        </div>
+    </div>
+</script>
+<!-- product list item in view state -->
+<script type="text/template" id="productView-template">
+    <div class="col-sm-10 productView">
+        <label><%=Name%></label>
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default editButton">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </button>
+            <button class="btn btn-default deleteButton">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
+        </div>
+    </div>
+</script>
+<!-- product list item in edit state -->
+<script type="text/template" id="productEdit-template">
+    <div class="col-sm-10">
+        <input type="text" name="Name" value="<%=Name%>" />
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default saveButton">
+                <span class="glyphicon glyphicon-ok"></span>
+            </button>
+            <button class="btn btn-default cancelButton">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+        </div>
+    </div>
+</script>
+<!-- product list item in select state -->
+<script type="text/template" id="productSelected-template">
+    <div class="col-sm-10" style="background-color: cyan">
+        <label><%=Name%></label>
+    </div>
+    <div class="col-sm-2">
+        <label>(<%=id%>)</label>
+    </div>
+</script>
+
+<!-- LINE -->
+<!-- line list header and add button -->
+<script type="text/template" id="lineListView-template">
+    <div class="col-sm-10">
+        <h4>Assembly lines</h4>
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default addButton">
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
+        </div>
+    </div>
+</script>
+<!-- line list header and add form -->
+<script type="text/template" id="lineListAddView-template">
+    <div class="col-sm-12">
+        <h4>Add new assembly line</h4>
+    </div>
+    <div class="col-sm-10">
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <input type="text" name="Name" />
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default saveButton">
+                <span class="glyphicon glyphicon-ok"></span>
+            </button>
+        </div>
+        <div class="row">
+            <button class="btn btn-default cancelButton">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+        </div>
+    </div>
+</script>
+<!-- line list item in view state -->
+<script type="text/template" id="lineView-template">
+    <div class="col-sm-10 lineView">
+        <label><%=Name%></label>
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default editButton">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </button>
+            <button class="btn btn-default deleteButton">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
+        </div>
+    </div>
+</script>
+<!-- line list item in edit state -->
+<script type="text/template" id="lineEdit-template">
+    <div class="col-sm-10">
+        <input type="text" name="Name" value="<%=Name%>" />
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default saveButton">
+                <span class="glyphicon glyphicon-ok"></span>
+            </button>
+            <button class="btn btn-default cancelButton">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+        </div>
+    </div>
+</script>
+<!-- line list item in select state -->
+<script type="text/template" id="lineSelected-template">
+    <div class="col-sm-10" style="background-color: cyan">
+        <label><%=Name%></label>
+    </div>
+    <div class="col-sm-2">
+        <label>(<%=id%>)</label>
+    </div>
+</script>
+<!-- OPERATION -->
+<!-- operation list header and add button -->
+<script type="text/template" id="operationListView-template">
+    <div class="col-sm-10">
+        <h4>Operations</h4>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-default addButton">
+            <span class="glyphicon glyphicon-plus"></span>
         </button>
     </div>
-    <div class="col-sm-10 col-sm-offset-2">
-        <% _.each(Lines, function (line) {%>
-        <div class="col-sm-12">
-            <div class="col-sm-10">
-                <%=line.LineId%>
-            </div>
-            <div class="col-sm-2">
-                <button class="btn btn-default">
-                    <span class="glyphicon glyphicon-trash lineDeleteButton" data-lineId="<%=line.LineId%>"></span>
-                </button>
-            </div>
-        </div>
-        <% }) %>
-    </div>
 </script>
-
-<script type="text/template" id="lineList-template">
+<!-- operation list header and add form -->
+<script type="text/template" id="operationListAddView-template">
     <div class="col-sm-12">
-        <div class="col-sm-2">
-            <%=id%>
+        <h4>Add new operation</h4>
+    </div>
+    <div class="col-sm-10">
+        <div class="form-group">
+            <label for="Name">Name</label>
+            <input type="text" name="Name" />
         </div>
-        <div class="col-sm-7">
-            <%=Name%>
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default saveButton">
+                <span class="glyphicon glyphicon-ok"></span>
+            </button>
         </div>
-        <div class="col-sm-3">
-            <div class="row">
-                <button class="btn btn-default editButton">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </button>
-            </div>
-            <div class="row">
-                <button class="btn btn-default deleteButton">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </button>
-            </div>
+        <div class="row">
+            <button class="btn btn-default cancelButton">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
         </div>
     </div>
 </script>
-
-<script type="text/template" id="lineListEdit-template">
-    <div class="col-sm-12">
-        <div class="col-sm-2">
-            <%=id%>
+<!-- operation list item in view state -->
+<script type="text/template" id="operationView-template">
+    <div class="col-sm-10">
+        <label><%=Name%></label>
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default editButton">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </button>
         </div>
-        <div class="col-sm-7">
-            <input name="Name" type="text" value="<%=Name%>" />
-        </div>
-        <div class="col-sm-3">
-            <div class="row">
-                <button class="btn btn-default saveButton">
-                    <span class="glyphicon glyphicon-ok"></span>
-                </button>
-            </div>
-            <div class="row">
-                <button class="btn btn-default cancelButton">
-                    <span class="glyphicon glyphicon-remove"></span>
-                </button>
-            </div>
+        <div class="row">
+            <button class="btn btn-default deleteButton">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
         </div>
     </div>
 </script>
-
-<script type="text/template" id="status-template">
-    <div class="col-sm-12">
-        <div class="col-sm-2">
-            <%=id%>
-        </div>
-        <div class="col-sm-3">
-            <%=Complete%>
-        </div>
-        <div class="col-sm-2">
-            <%=ProductId%>
-        </div>
-        <div class="col-sm-2">
-            <%=OperationId%>
-        </div>
-        <div class="col-sm-3">
-            <div class="row">
-                <button class="btn btn-default editButton">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                </button>
-            </div>
-            <div class="row">
-                <button class="btn btn-default deleteButton">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </button>
-            </div>
-        </div>
+<!-- operation list item in edit state-->
+<script type="text/template" id="operationEditView-template">
+    <div class="col-sm-10">
+        <input type="text" name="Name" value="<%=Name%>" />
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <button class="btn btn-default cancelButton">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
     </div>
 </script>
 
-<script type="text/template" id="statusAdd-template">
-
+<!-- STATUS -->
+<!-- status list and add button -->
+<script type="text/template" id="statusListView-template">
+    <div class="col-sm-10">
+        <h4>Statuses</h4>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-default addButton">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+    </div>
 </script>
-
-<script type="text/template" id="statusEdit-template">
-
+<!-- status list and add form -->
+<script type="text/template" id="statusListAddView-template">
+    <div class="col-sm-10">
+        <h4>Add new status</h4>
+    </div>
+    <div class="col-sm-2">
+        <div class="row">
+            <button class="btn btn-default saveButton">
+                <span class="glyphicon glyphicon-ok"></span>
+            </button>
+        </div>
+        <div class="row">
+            <button class="btn btn-default cancelButton">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+        </div>
+    </div>
+    <div class="col-sm-10">
+        <div class="form-group">
+            <label for="ProductId">Product</label>
+            <select name="ProductId"></select>
+        </div>
+        <div class="form-group">
+            <label for="OperationId">Operation</label>
+            <select name="OperationId"></select>
+        </div>
+        <div class="form-group">
+            <label for="Notes">Notes</label>
+            <input type="text" name="Notes" />
+        </div>
+        <div class="form-group">
+            <label for="Complete">Complete</label>
+            <input type="checkbox" name="Complete" />
+        </div>
+    </div>
+</script>
+<!-- status in view state-->
+<script type="text/template" id="statusView-template">
+    <p>todo in view state.</p>
+    <div class="row">
+        <button class="btn btn-default editButton">
+            <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+    </div>
+    <div class="row">
+        <button class="btn btn-default deleteButton">
+            <span class="glyphicon glyphicon-trash"></span>
+        </button>
+    </div>
+</script>
+<!-- status in edit state-->
+<script type="text/template" id="statusEditView-template">
+    <p>todo in edit state.</p>
+    <div class="row">
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+    </div>
+    <div class="row">
+        <button class="btn btn-default cancelButton">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+    </div>
 </script>
 
 @section scripts {
@@ -192,8 +338,8 @@
         require.config({
             baseUrl: 'ts'
         });
-        require(['/ts/Application.js'], function (ts) {
-            ts.Application.Run();
+        require(['/ts/Main.js'], function (ts) {
+            // we just want require to load our main module.
         });
     </script>
 }

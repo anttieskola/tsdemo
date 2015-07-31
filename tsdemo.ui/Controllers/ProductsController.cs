@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
@@ -7,9 +6,6 @@ using tsdemo.logic.Dal;
 using tsdemo.logic.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
 using Microsoft.Data.Entity;
-//using tsdemo.logic.Entity;
-
-// For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace tsdemo.ui.Controllers
 {
@@ -17,11 +13,6 @@ namespace tsdemo.ui.Controllers
     public class ProductsController : Controller
     {
         private AssemblyContext _context;
-
-        /// <summary>
-        /// Automatic dependency injection
-        /// </summary>
-        /// <param name="context"></param>
         public ProductsController(AssemblyContext context)
         {
             _context = context;
