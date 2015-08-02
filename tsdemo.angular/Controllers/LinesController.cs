@@ -7,7 +7,7 @@ using tsdemo.logic.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
 using Microsoft.Data.Entity;
 
-namespace tsdemo.ui.Controllers
+namespace tsdemo.angular.Controllers
 {
     [Route("api/[controller]")]
     public class LinesController : Controller
@@ -63,13 +63,9 @@ namespace tsdemo.ui.Controllers
         [HttpDelete("{id}")]
         public async Task<bool> Delete(int id)
         {
-            var line = await _context.Lines.Include(l => l.Operations).FirstOrDefaultAsync(l => l.id == id);
+            var line = await _context.Lines.FirstOrDefaultAsync(l => l.id == id);
             if (line != null)
             {
-                foreach (var item in line.Operations)
-                {
-                    _context.Entry<Operation>(item).State = EntityState.Deleted;
-                }
                 _context.Entry<Line>(line).State = EntityState.Deleted;
                 await _context.SaveChangesAsync();
                 return true;

@@ -149,7 +149,7 @@ export class LinesSelectView extends bb.View<models.Line> {
     }
     render(): bb.View<models.Line> {
         // select
-        this.el = $('<select name="' + this.selectName + '" class="option">');
+        this.el = this.$el = $('<select name="' + this.selectName + '" class="option">');
         this.collection.each(l => {
             // option
             var lov = new LineOptionView;

@@ -12,10 +12,11 @@
     <!-- BootStrap panes for tabs -->
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="status">
-
+            <div class="col-sm-12" id="divProductStatus"></div>
         </div>
         <div role="tabpanel" class="tab-pane" id="products">
             <div class="col-sm-6" id="divProducts"></div>
+            <div class="col-sm-6" id="divProductLines"></div>
         </div>
         <div role="tabpanel" class="tab-pane" id="lines">
             <!-- Here you create lines and define it's operations -->
@@ -26,6 +27,97 @@
 </div>
 
 <!-- TEMPLATES -->
+<!-- PRODUCT STATUS -->
+<script type="text/template" id="productStatusView-template">
+    <div class="row">
+        <div class="col-sm-12">
+            <h3><%=Name%></h3>
+        </div>
+        <div class="col-sm-12">
+            <div class="operations"></div>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="productStatusLineView-template">
+    <div class="row">
+        <div class="col-sm-12">
+            <h4><%=Name%></h4>
+        </div>
+        <div class="col-sm-12">
+            <div class="operationView"></div>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="productStatusOperationView-template">
+    <div class="col-sm-4">
+        <div class="col-sm-12">
+            <h5><%=Name%></h5>
+        </div>
+        <div class="col-sm-12">
+            <div class="operationState"></div>
+        </div>
+    </div>
+</script>
+<!-- STATUS -->
+<!-- status in view state-->
+<script type="text/template" id="statusView-template">
+    <div class="col-sm-10">
+        <div class="col-sm-8">
+            <label><%=Notes%></label>
+        </div>
+        <div class="col-sm-2">
+            <%=Complete%>
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-default editButton">
+            <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+    </div>
+</script>
+<!-- status in add state -->
+<script type="text/template" id="statusAdd-template">
+    <div class="col-sm-10">
+        <div class="form-group">
+            <label for="Notes">Notes</label>
+            <input type="text" name="Notes" />
+        </div>
+        <div class="form-group">
+            <label for="Complete">Complete</label>
+            <input type="checkbox" name="Complete" />
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+    </div>
+</script>
+<!-- status in edit state-->
+<script type="text/template" id="statusEditView-template">
+    <div class="col-sm-8">
+        <div class="form-group">
+            <label for="Notes">Notes</label>
+            <input type="text" value="<%=Notes%>" name="Notes" />
+        </div>
+        <div class="form-group">
+            <label for="Complete">Complete</label>
+            <% if(Complete) {%>
+            <input type="checkbox" checked="checked" name="Complete" />
+            <%} else {%>
+            <input type="checkbox" name="Complete" />
+            <%}%>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <button class="btn btn-default cancelButton">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+    </div>
+</script>
 <!-- PRODUCT -->
 <!-- product list header and add button -->
 <script type="text/template" id="productListView-template">
@@ -33,11 +125,9 @@
         <h4>Products</h4>
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default addButton">
-                <span class="glyphicon glyphicon-plus"></span>
-            </button>
-        </div>
+        <button class="btn btn-default addButton">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
     </div>
 </script>
 <!-- product list header and add form -->
@@ -52,16 +142,12 @@
         </div>
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default saveButton">
-                <span class="glyphicon glyphicon-ok"></span>
-            </button>
-        </div>
-        <div class="row">
-            <button class="btn btn-default cancelButton">
-                <span class="glyphicon glyphicon-remove"></span>
-            </button>
-        </div>
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <button class="btn btn-default cancelButton">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
     </div>
 </script>
 <!-- product list item in view state -->
@@ -70,14 +156,12 @@
         <label><%=Name%></label>
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default editButton">
-                <span class="glyphicon glyphicon-pencil"></span>
-            </button>
-            <button class="btn btn-default deleteButton">
-                <span class="glyphicon glyphicon-trash"></span>
-            </button>
-        </div>
+        <button class="btn btn-default editButton">
+            <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+        <button class="btn btn-default deleteButton">
+            <span class="glyphicon glyphicon-trash"></span>
+        </button>
     </div>
 </script>
 <!-- product list item in edit state -->
@@ -86,14 +170,12 @@
         <input type="text" name="Name" value="<%=Name%>" />
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default saveButton">
-                <span class="glyphicon glyphicon-ok"></span>
-            </button>
-            <button class="btn btn-default cancelButton">
-                <span class="glyphicon glyphicon-remove"></span>
-            </button>
-        </div>
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <button class="btn btn-default cancelButton">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
     </div>
 </script>
 <!-- product list item in select state -->
@@ -105,7 +187,48 @@
         <label>(<%=id%>)</label>
     </div>
 </script>
-
+<!-- PRODUCT LINES -->
+<!-- product lines header and add button -->
+<script type="text/template" id="productLineListView-template">
+    <div class="col-sm-10">
+        <h4>Product's assembly Lines</h4>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-default addButton">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+    </div>
+</script>
+<!-- product lines header and add form -->
+<script type="text/template" id="productLineListAddView-template">
+    <div class="col-sm-12">
+        <h4>Add assembly line</h4>
+    </div>
+    <div class="col-sm-10">
+        <div class="form-group">
+            <select></select>
+        </div>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        <button class="btn btn-default cancelButton">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+    </div>
+</script>
+<!-- product lines item view -->
+<script type="text/template" id="productLine-template">
+    <div class="col-sm-10 productView">
+        <label><%=Name%></label>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-default deleteButton">
+            <span class="glyphicon glyphicon-trash"></span>
+        </button>
+    </div>
+</script>
 <!-- LINE -->
 <!-- line list header and add button -->
 <script type="text/template" id="lineListView-template">
@@ -113,11 +236,9 @@
         <h4>Assembly lines</h4>
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default addButton">
-                <span class="glyphicon glyphicon-plus"></span>
-            </button>
-        </div>
+        <button class="btn btn-default addButton">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
     </div>
 </script>
 <!-- line list header and add form -->
@@ -132,16 +253,12 @@
         </div>
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default saveButton">
-                <span class="glyphicon glyphicon-ok"></span>
-            </button>
-        </div>
-        <div class="row">
-            <button class="btn btn-default cancelButton">
-                <span class="glyphicon glyphicon-remove"></span>
-            </button>
-        </div>
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <button class="btn btn-default cancelButton">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
     </div>
 </script>
 <!-- line list item in view state -->
@@ -150,14 +267,12 @@
         <label><%=Name%></label>
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default editButton">
-                <span class="glyphicon glyphicon-pencil"></span>
-            </button>
-            <button class="btn btn-default deleteButton">
-                <span class="glyphicon glyphicon-trash"></span>
-            </button>
-        </div>
+        <button class="btn btn-default editButton">
+            <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+        <button class="btn btn-default deleteButton">
+            <span class="glyphicon glyphicon-trash"></span>
+        </button>
     </div>
 </script>
 <!-- line list item in edit state -->
@@ -166,14 +281,12 @@
         <input type="text" name="Name" value="<%=Name%>" />
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default saveButton">
-                <span class="glyphicon glyphicon-ok"></span>
-            </button>
-            <button class="btn btn-default cancelButton">
-                <span class="glyphicon glyphicon-remove"></span>
-            </button>
-        </div>
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <button class="btn btn-default cancelButton">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
     </div>
 </script>
 <!-- line list item in select state -->
@@ -209,16 +322,12 @@
         </div>
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default saveButton">
-                <span class="glyphicon glyphicon-ok"></span>
-            </button>
-        </div>
-        <div class="row">
-            <button class="btn btn-default cancelButton">
-                <span class="glyphicon glyphicon-remove"></span>
-            </button>
-        </div>
+        <button class="btn btn-default saveButton">
+            <span class="glyphicon glyphicon-ok"></span>
+        </button>
+        <button class="btn btn-default cancelButton">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
     </div>
 </script>
 <!-- operation list item in view state -->
@@ -227,16 +336,12 @@
         <label><%=Name%></label>
     </div>
     <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default editButton">
-                <span class="glyphicon glyphicon-pencil"></span>
-            </button>
-        </div>
-        <div class="row">
-            <button class="btn btn-default deleteButton">
-                <span class="glyphicon glyphicon-trash"></span>
-            </button>
-        </div>
+        <button class="btn btn-default editButton">
+            <span class="glyphicon glyphicon-pencil"></span>
+        </button>
+        <button class="btn btn-default deleteButton">
+            <span class="glyphicon glyphicon-trash"></span>
+        </button>
     </div>
 </script>
 <!-- operation list item in edit state-->
@@ -254,83 +359,6 @@
     </div>
 </script>
 
-<!-- STATUS -->
-<!-- status list and add button -->
-<script type="text/template" id="statusListView-template">
-    <div class="col-sm-10">
-        <h4>Statuses</h4>
-    </div>
-    <div class="col-sm-2">
-        <button class="btn btn-default addButton">
-            <span class="glyphicon glyphicon-plus"></span>
-        </button>
-    </div>
-</script>
-<!-- status list and add form -->
-<script type="text/template" id="statusListAddView-template">
-    <div class="col-sm-10">
-        <h4>Add new status</h4>
-    </div>
-    <div class="col-sm-2">
-        <div class="row">
-            <button class="btn btn-default saveButton">
-                <span class="glyphicon glyphicon-ok"></span>
-            </button>
-        </div>
-        <div class="row">
-            <button class="btn btn-default cancelButton">
-                <span class="glyphicon glyphicon-remove"></span>
-            </button>
-        </div>
-    </div>
-    <div class="col-sm-10">
-        <div class="form-group">
-            <label for="ProductId">Product</label>
-            <select name="ProductId"></select>
-        </div>
-        <div class="form-group">
-            <label for="OperationId">Operation</label>
-            <select name="OperationId"></select>
-        </div>
-        <div class="form-group">
-            <label for="Notes">Notes</label>
-            <input type="text" name="Notes" />
-        </div>
-        <div class="form-group">
-            <label for="Complete">Complete</label>
-            <input type="checkbox" name="Complete" />
-        </div>
-    </div>
-</script>
-<!-- status in view state-->
-<script type="text/template" id="statusView-template">
-    <p>todo in view state.</p>
-    <div class="row">
-        <button class="btn btn-default editButton">
-            <span class="glyphicon glyphicon-pencil"></span>
-        </button>
-    </div>
-    <div class="row">
-        <button class="btn btn-default deleteButton">
-            <span class="glyphicon glyphicon-trash"></span>
-        </button>
-    </div>
-</script>
-<!-- status in edit state-->
-<script type="text/template" id="statusEditView-template">
-    <p>todo in edit state.</p>
-    <div class="row">
-        <button class="btn btn-default saveButton">
-            <span class="glyphicon glyphicon-ok"></span>
-        </button>
-    </div>
-    <div class="row">
-        <button class="btn btn-default cancelButton">
-            <span class="glyphicon glyphicon-remove"></span>
-        </button>
-    </div>
-</script>
-
 @section scripts {
     <!-- application loaded with require -->
     <script src="~/lib/requirejs/require.js"></script>
@@ -339,7 +367,7 @@
             baseUrl: 'ts'
         });
         require(['/ts/Main.js'], function (ts) {
-            // we just want require to load our main module.
+            ts.Run();
         });
     </script>
 }

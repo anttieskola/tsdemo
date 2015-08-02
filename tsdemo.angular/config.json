@@ -1,0 +1,5 @@
+{
+  "ConnectionString": {
+    "localhost": "Data Source=localhost;Initial Catalog=tsdemo;Integrated Security=false;User Id=tsdemo;Password=tsdemo;MultipleActiveResultSets=True"
+  }
+}

@@ -45,7 +45,7 @@ export class OperationList extends bb.View<models.Operation> {
                 var opt = new OperationView;
                 opt.model = o;
                 // append
-                this.el.append(opt.render().el);
+                this.$el.append(opt.render().el);
             }
         }, this);
         return this;

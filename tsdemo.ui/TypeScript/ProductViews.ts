@@ -1,15 +1,19 @@
 ﻿import bb = Backbone;
 import models = require("Models");
+import lineViews = require("LineViews");
 
 enum ViewState { View, Edit, Add, List, Selected };
 
 export class ProductList extends bb.View<models.Product> {
+    private productLineElement: string;
     private state: ViewState;
     private selectedProduct: number;
     private listTemplate: (data: any) => string;
     private listAddTemplate: (data: any) => string;
-    constructor() {
+    constructor(productLineElement: string) {
+        this.productLineElement = productLineElement;
         this.state = ViewState.List;
+        this.selectedProduct = 0;
         this.listTemplate = _.template($('#productListView-template').html());
         this.listAddTemplate = _.template($('#productListAddView-template').html());
         this.collection = models.Collections().Products;
@@ -40,12 +44,19 @@ export class ProductList extends bb.View<models.Product> {
         }
         // list
         this.collection.each(productModel => {
+            // create view
             var pv = new ProductView;
             pv.Selected(productModel.id == this.selectedProduct);
             pv.model = productModel;
             // append
             this.$el.append(pv.render().el);
         }, this);
+        // product lines
+        if (this.selectedProduct != 0) {
+            var plv = new ProductLinesView(this.selectedProduct);
+            plv.$el = $(this.productLineElement);
+            plv.render();
+        }
         return this;
     }
     // view state changes
@@ -90,7 +101,7 @@ class ProductView extends bb.View<models.Product> {
                 this.delegateEvents({
                     "click .editButton": "stateEdit",
                     "click .deleteButton": "stateDelete",
-                    "click .lineView": "stateSelected"
+                    "click .productView": "stateSelected"
                 });
                 break;
             case ViewState.Edit:
@@ -139,6 +150,98 @@ class ProductView extends bb.View<models.Product> {
         }
     }
 }
+// products lines list view
+export class ProductLinesView extends bb.View<models.ProductLine> {
+    private productId: number;
+    private state: ViewState;
+    private listTemplate: (data: any) => string;
+    private listAddTemplate: (data: any) => string;
+    constructor(productId: number) {
+        this.productId = productId;
+        this.state = ViewState.List;
+        this.collection = new bb.Collection<models.ProductLine>(
+            models.Collections().Products.get(this.productId).Lines);
+        this.listTemplate = _.template($('#productLineListView-template').html());
+        this.listAddTemplate = _.template($('#productLineListAddView-template').html());
+        super();
+    }
+    render(): bb.View<models.ProductLine> {
+        // header
+        switch (this.state) {
+            case ViewState.List:
+                this.el = this.$el.html(this.listTemplate(null));
+                this.undelegateEvents();
+                this.delegateEvents({ "click .addButton": "stateAdd" });
+                break;
+            case ViewState.Add:
+                this.el = this.$el.html(this.listAddTemplate(null));
+                var lineListSelect = new lineViews.LinesSelectView("lineId");
+                this.$el.find('select').replaceWith(lineListSelect.render().el);
+                this.undelegateEvents();
+                this.delegateEvents({
+                    "click .saveButton": "stateSave",
+                    "click .cancelButton": "stateCancel"
+                });
+                break;
+        }
+        // collection
+        this.collection.each(pl => {
+            var plv = new ProductLineView(this.productId, pl.get('LineId'));
+            this.$el.append(plv.render().el);
+        }, this);
+        return this;
+    }
+    private stateSave() {
+        // todo save
+        debugger;
+        // fetch data
+        var lineId = this.$el.find('select').val();
+        // create new product line
+        var pl = new models.ProductLine;
+        pl.LineId = lineId;
+        pl.ProductId = this.productId;
+        // add it to product and save
+        var product = models.Collections().Products.get(this.productId);
+        product.Lines.push(pl);
+        product.save();
+        // state change to back list
+        this.state = ViewState.List;
+        this.render();
+    }
+    private stateCancel() {
+        this.state = ViewState.List;
+        this.render();
+    }
+    private stateAdd() {
+        this.state = ViewState.Add;
+        this.render();
+    }
+}
+// product line item view
+export class ProductLineView extends bb.View<models.ProductLine> {
+    private productId: number;
+    private lineId: number;
+    private template: (data: any) => string;
+    constructor(productId: number, lineId: number) {
+        this.productId = productId;
+        this.lineId = lineId;
+        this.template = _.template($('#productLine-template').html());
+        super();
+    }
+    render(): bb.View<models.ProductLine> {
+        this.undelegateEvents();
+        this.delegateEvents({ "click .deleteButton": "stateDelete" });
+        var line = models.Collections().Lines.get(this.lineId);
+        this.el = this.$el.html(this.template({ "Name": line.Name }));
+        return this;
+    }
+    private stateDelete() {
+        var product = models.Collections().Products.get(this.productId);
+        product.Lines = product.Lines.filter((p) => p.LineId != this.lineId);
+        product.save();
+        this.model.destroy();
+    }
+}
 // Drop down list of products
 export class ProductsSelectView extends bb.View<models.Product> {
     private selectName: string;
@@ -155,7 +258,7 @@ export class ProductsSelectView extends bb.View<models.Product> {
             var opt = new ProductsSelectViewOption;
             opt.model = m;
             // append
-            this.el.append(opt.render().el);
+            this.$el.append(opt.render().el);
         }, this);
         return this;
     }
@@ -168,3 +271,4 @@ class ProductsSelectViewOption extends bb.View<models.Product> {
         return this;
     }
 }
+  

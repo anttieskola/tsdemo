@@ -7,39 +7,38 @@ using tsdemo.logic.Entity;
 using Microsoft.Data.Entity.ChangeTracking;
 using Microsoft.Data.Entity;
 
-namespace tsdemo.ui.Controllers
+namespace tsdemo.angular.Controllers
 {
     [Route("api/[controller]")]
-    public class LinesController : Controller
+    public class OperationsController : Controller
     {
         private AssemblyContext _context;
-        public LinesController(AssemblyContext context)
+        public OperationsController(AssemblyContext context)
         {
             _context = context;
         }
 
         // GET: api/values
         [HttpGet]
-        public IEnumerable<Line> Get()
+        public IEnumerable<Operation> Get()
         {
-            return _context.Lines.Include(l => l.Operations).ToList();
+            return _context.Operations.ToList();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public async Task<Line> Get(int id)
+        public Operation Get(int id)
         {
-            return await _context.Lines.Include(l => l.Operations)
-                .FirstOrDefaultAsync(l => l.id == id);
+            return _context.Operations.FirstOrDefault(o => o.id == id);
         }
 
         // POST api/values
         [HttpPost]
-        public async Task<Line> Post([FromBody]Line line)
+        public async Task<Operation> Post([FromBody]Operation value)
         {
             if (ModelState.IsValid)
             {
-                EntityEntry<Line> ee = _context.Lines.Add(line);
+                EntityEntry<Operation> ee = _context.Operations.Add(value);
                 await _context.SaveChangesAsync();
                 return ee.Entity;
             }
@@ -48,11 +47,11 @@ namespace tsdemo.ui.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public async Task<Line> Put(int id, [FromBody]Line value)
+        public async Task<Operation> Put(int id, [FromBody]Operation value)
         {
             if (ModelState.IsValid)
             {
-                _context.Entry<Line>(value).State = EntityState.Modified;
+                _context.Entry<Operation>(value).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
                 return value;
             }
@@ -63,14 +62,10 @@ namespace tsdemo.ui.Controllers
         [HttpDelete("{id}")]
         public async Task<bool> Delete(int id)
         {
-            var line = await _context.Lines.Include(l => l.Operations).FirstOrDefaultAsync(l => l.id == id);
-            if (line != null)
+            var operation =  await _context.Operations.FirstOrDefaultAsync(o => o.id == id);
+            if (operation != null)
             {
-                foreach (var item in line.Operations)
-                {
-                    _context.Entry<Operation>(item).State = EntityState.Deleted;
-                }
-                _context.Entry<Line>(line).State = EntityState.Deleted;
+                _context.Entry<Operation>(operation).State = EntityState.Deleted;
                 await _context.SaveChangesAsync();
                 return true;
             }

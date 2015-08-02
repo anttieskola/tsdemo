@@ -3,33 +3,42 @@ import models = require("Models");
 import productViews = require("ProductViews");
 import lineViews = require("LineViews");
 import operationViews = require("OperationViews");
+import productStatusViews = require("ProjectStatusViews");
 
 // main application
 export class Application {
     private selectedLineId: number;
     private selectedProductId: number;
+    private productStatusList: productStatusViews.ProductStatusViewList;
     private productList: productViews.ProductList;
     private lineList: lineViews.LineList;
     private operationList: operationViews.OperationList;
     constructor() {
         // views
-        this.productList = new productViews.ProductList;
+        this.productStatusList = new productStatusViews.ProductStatusViewList();
+        this.productStatusList.$el = $('#divProductStatus');
+        this.productList = new productViews.ProductList("#divProductLines");
         this.productList.$el = $('#divProducts');
         this.lineList = new lineViews.LineList();
         this.lineList.$el = $('#divLines');
-
+        this.productStatusList.render();
+        this.productList.render();
+        this.lineList.render();
         // messages
-        models.Messaging().bind("selectProduct", this.SelectProduct, this);
-        models.Messaging().bind("selectLine", this.SelectLine, this);
-
+        models.Messaging().bind("selectProduct", this.selectProduct, this);
+        models.Messaging().bind("selectLine", this.selectLine, this);
     }
-    SelectProduct(param: any) {
+    public Run() {
+        // noop
+    }
+    // message handlers
+    private selectProduct(param: any) {
         var productId = parseInt(param);
         if (productId > 0 && productId != this.selectedProductId) {
-            // TODO, need productline view first
+            this.productList.SelectProduct(productId);
         }
     }
-    SelectLine(param: any) {
+    private selectLine(param: any) {
         var lineId = parseInt(param);
         if (lineId > 0 && lineId != this.selectedLineId) {
             // have to remove old view so events won't be called from it also
@@ -45,14 +54,7 @@ export class Application {
         }
     }
 }
-// global access to application
-export function App(): Application {
-    return application;
-}
-// dummy
 export function Run() {
     console.log("Application start");
+    var application = new Application();
 }
-
-// global application instance
-var application = new Application;

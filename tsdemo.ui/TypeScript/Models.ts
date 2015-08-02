@@ -146,6 +146,7 @@ export class Product extends bb.Model implements IProduct {
 }
 export class Status extends bb.Model implements IStatus {
     constructor(options?: any) {
+        this.urlRoot = "/api/statuses";
         super(options);
     }
     get Complete(): boolean {

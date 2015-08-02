@@ -1,80 +1,48 @@
 ﻿import bb = Backbone;
 import models = require("Models");
-import productViews = require("ProductViews");
 
 enum ViewState { View, Edit, Add, List };
-// collection view
-export class StatusList extends bb.View<models.Status> {
+
+export class StatusView extends bb.View<models.Status> {
     private state: ViewState;
-    private listTemplate: (data: any) => string;
-    private listAddTemplate: (data: any) => string;
-    constructor(options?: any) {
-        this.listTemplate = _.template($('#statusListView-template').html());
-        this.listAddTemplate = _.template($('#statusListAddView-template').html());
-        this.state = ViewState.List;
-        super(options);
-    }
-    render(): bb.View<models.Status> {
-        // render header
-        switch (this.state) {
-            case ViewState.List:
-                this.el = this.$el.html(this.listTemplate(null));
-                this.delegateEvents({ "click .addButton": "stateAdd" });
-                break;
-            case ViewState.Add:
-                this.el = this.$el.html(this.listAddTemplate(null));
-                var ps = new productViews.ProductsSelectView("ProductId");
-                this.$el.find('select[name=ProductId]').replaceWith(ps.render().el);
-                this.delegateEvents({
-                    "click .saveButton": "stateSave",
-                    "click .cancelButton": "stateCancel"
-                });
-                break;
-        }
-        // render list
-        this.collection.each(s => {
-            var slv = new StatusView;
-            slv.model = s;
-            this.el.append(slv.render().el);
-        }, this);
-        return this;
-    }
-    // view state changes
-    stateAdd() {
-        this.state = ViewState.Add;
-        this.render();
-    }
-    stateSave() {
-        // todo save
-        this.state = ViewState.List;
-        this.render();
-    }
-    stateCancel() {
-        this.state = ViewState.List;
-        this.render();
-    }
-}
-class StatusView extends bb.View<models.Status> {
-    private state: ViewState;
+    private productId: number;
+    private operationId: number;
     private template: (data: any) => string;
     private templateEdit: (data: any) => string;
-    constructor(options?: any) {
+    private templateAdd: (data: any) => string;
+    constructor(productId: number, operationId: number) {
+        this.state = ViewState.View;
+        this.productId = productId;
+        this.operationId = operationId;
         this.template = _.template($('#statusView-template').html());
         this.templateEdit = _.template($('#statusEditView-template').html());
-        super(options);
+        this.templateAdd = _.template($('#statusAdd-template').html());
+        super();
     }
     // render one of the two layouts
     render(): bb.View<models.Status> {
+        if (this.model == null) {
+            this.state = ViewState.Add;
+        }
         switch (this.state) {
             case ViewState.View:
                 this.$el.html(this.template(this.model.toJSON()));
+                this.undelegateEvents();
                 this.delegateEvents({
-                    "click .editButton": "stateEdit",
-                    "click .deleteButton": "stateDelete"
+                    "click .editButton": "stateEdit"
+                });
+                break;
+            case ViewState.Add:
+                this.$el.html(this.templateAdd(null));
+                this.undelegateEvents();
+                this.delegateEvents({
+                    "click .saveButton": "stateAdd",
+                    "click .cancelButton": "stateCancel"
                 });
                 break;
             case ViewState.Edit:
                 this.$el.html(this.templateEdit(this.model.toJSON()));
+                this.undelegateEvents();
                 this.delegateEvents({
                     "click .saveButton": "stateSave",
                     "click .cancelButton": "stateCancel"
@@ -84,17 +52,31 @@ class StatusView extends bb.View<models.Status> {
         return this;
     }
     // view state changes
-    stateEdit() {
+    private stateEdit() {
         this.state = ViewState.Edit;
+        this.render();
     }
-    stateDelete() {
-        this.model.destroy();
-    }
-    stateSave() {
-        // todo save
+    private stateAdd() {
+        var s = new models.Status;
+        s.ProductId = this.productId;
+        s.OperationId = this.operationId;
+        s.Complete = this.$el.find('input[type=checkbox]').prop('checked');
+        s.Notes = this.$el.find('input[type=text]').val();
+        this.model = models.Collections().Statuses.create(s, { wait: true });
         this.state = ViewState.View;
+        this.render();
     }
-    stateCancel() {
+    private stateSave() {
+        this.model.ProductId = this.productId;
+        this.model.OperationId = this.operationId;
+        this.model.Complete = this.$el.find('input[type=checkbox]').prop('checked');
+        this.model.Notes = this.$el.find('input[type=text]').val();
+        this.model.save();
         this.state = ViewState.View;
+        this.render();
+    }
+    private stateCancel() {
+        this.state = ViewState.View;
+        this.render();
     }
 }
